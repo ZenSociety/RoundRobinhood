@@ -43,7 +43,7 @@ The addon saves item counts per character, allowing you to maintain your progres
 This addon is released under the MIT License.
 
 ## Support
-For issues or feature requests, please open an issue on the [GitHub repository](https://github.com/Croc/RoundRobinhood/issues) or contact the author directly.
+For issues or feature requests, please open an issue on the [GitHub repository](https://github.com/ZenSociety/RoundRobinhood/issues) or contact the author directly.
 
 ## Acknowledgments
 Thanks to the Turtle WoW Team.
