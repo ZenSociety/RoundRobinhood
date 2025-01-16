@@ -9,11 +9,12 @@
 - Sends messages to the group or raid chat to inform players of item counts and distribution.
 - Supports commands for managing item counts and settings.
 
-## Installation
-1. Download the latest version of the addon.
-2. Extract the contents of the zip file.
-3. Place the `RoundRobinhood` folder into your WoW `/Interface/AddOns/` directory.
-4. Launch WoW and enable the addon in the AddOns menu.
+## Installation (Vanilla, 1.12)
+1. Download **[Latest Version](https://github.com/ZenSociety/RoundRobinhood/archive/master.zip)**
+2. Unpack the Zip file
+3. Rename the folder "RoundRobinhood-main" to "RoundRobinhood"
+4. Copy "RoundRobinhood" into Wow-Directory\Interface\AddOns
+5. Restart WoW game client.
 
 ## Commands
 Use the following commands in the chat to interact with the addon:
