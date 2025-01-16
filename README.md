@@ -9,6 +9,8 @@
 - Sends messages to the group or raid chat to inform players of item counts and distribution.
 - Supports commands for managing item counts and settings.
 
+![preview](rr1.png)
+
 ## Installation (Vanilla, 1.12)
 1. Download **[Latest Version](https://github.com/ZenSociety/RoundRobinhood/archive/master.zip)**
 2. Unpack the Zip file
