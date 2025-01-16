@@ -34,7 +34,11 @@ local function sendCurrItemCount(receiver)
 	end;
 	local tempMsg = table.concat(messageParts, ", ");
 	if receiver == "player" then
-		print("You are not in a party yet. " .. tempMsg);
+		if channelToSent == "SAY" then
+			print("Previous results:" .. tempMsg);
+		else
+			print("Current results:" .. tempMsg);
+		end;
 	elseif receiver == "group" then
 		SendChatMessage(tempMsg, channelToSent);
 	end;
@@ -136,6 +140,7 @@ local function HandleLootRoll(rollID)
 	end;
 	local texture, name, count = GetLootRollItemInfo(rollID);
 	if name == targetItemName and (not ismute) then
+		OnGroupChanged();
 		flagSay = true;
 		SendChatMessage("Before this roll:", channelToSent);
 		sendCurrItemCount("group");
