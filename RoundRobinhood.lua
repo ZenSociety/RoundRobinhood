@@ -1,15 +1,13 @@
 RRFrame = CreateFrame("Frame", "RoundRobinFrame", WorldFrame);
-RRFrame:RegisterEvent("CHAT_MSG_LOOT");
 RRFrame:RegisterEvent("START_LOOT_ROLL");
-RRFrame:RegisterEvent("PARTY_MEMBERS_CHANGED");
-RRFrame:RegisterEvent("RAID_ROSTER_UPDATE");
+RRFrame:RegisterEvent("CHAT_MSG_LOOT");
 local targetItemName = "";
+local numTargetItemInRoll = 0;
 local playerItems = {};
+local playerName = "";
+local tbGroupRollChoices = {};
 local isMute = false;
-local flagSay = false;
 local channelToSent = "SAY";
-local numPartyMembers = 0;
-local numRaidMembers = 0;
 local gfind = string.gmatch or string.gfind;
 local function Print(msg)
 	if not DEFAULT_CHAT_FRAME then
@@ -17,233 +15,271 @@ local function Print(msg)
 	end;
 	DEFAULT_CHAT_FRAME:AddMessage(msg);
 end;
-local function sendCurrItemCount(receiver)
-	local sortedPlayerItems = {};
-	for name, data in pairs(playerItems) do
-		table.insert(sortedPlayerItems, {
-			name = name,
-			data = data
-		});
+local function SendMsg(msg)
+	if isMute then
+		return;
 	end;
-	table.sort(sortedPlayerItems, function(a, b)
-		return a.data.unitIndex < b.data.unitIndex;
-	end);
-	local messageParts = {};
-	for _, playerData in ipairs(sortedPlayerItems) do
-		table.insert(messageParts, string.format("%s %d", playerData.name, playerData.data.count));
-	end;
-	local tempMsg = table.concat(messageParts, ", ");
-	if receiver == "player" then
-		if channelToSent == "SAY" then
-			print("Previous results:" .. tempMsg);
-		else
-			print("Current results:" .. tempMsg);
-		end;
-	elseif receiver == "group" then
-		SendChatMessage(tempMsg, channelToSent);
+	if channelToSent == "SAY" then
+		Print(msg);
+	else
+		SendChatMessage(msg, channelToSent);
 	end;
 end;
-local function ResetRaid(num)
-	playerItems = {};
-	for i = 1, num do
-		local name = UnitName("raid" .. i);
-		if name then
-			playerItems[name] = {
-				count = 0,
-				unitIndex = i
-			};
-		end;
+local function SendGroupCount(des)
+	if isMute then
+		return;
 	end;
-	if flagSay then
-		local tempMsg = "New player joined, [" .. targetItemName .. "] counts have been reset";
-		SendChatMessage(tempMsg, channelToSent);
+	groupCountResult = "";
+	for name, count in pairs(playerItems) do
+		local memberCountResult = name .. " " .. count .. ", ";
+		groupCountResult = groupCountResult .. memberCountResult;
 	end;
-end;
-local function ResetParty(num)
-	playerItems = {};
-	for i = 1, num do
-		local name = UnitName("party" .. i);
-		if name then
-			playerItems[name] = {
-				count = 0,
-				unitIndex = i
-			};
-		end;
-	end;
-	playerItems[UnitName("player")] = {
-		count = 0,
-		unitIndex = num + 1
-	};
-	if flagSay then
-		local tempMsg = "New player joined, [" .. targetItemName .. "] counts have been reset";
-		SendChatMessage(tempMsg, channelToSent);
+	groupCountResult = string.sub(groupCountResult, 1, -3);
+	if des == "members" then
+		SendMsg(groupCountResult);
+	elseif des == "player" then
+		Print(groupCountResult);
 	end;
 end;
-local function RemoveMemberFromParty()
-	local tempPlayerItems = {};
-	for i = 1, numPartyMembers do
-		local name = UnitName("party" .. i);
-		if name and playerItems[name] then
-			tempPlayerItems[name] = playerItems[name];
+local function ResetGroup()
+	local currnumPartyMembers = GetNumPartyMembers();
+	local currnumRaidMembers = GetNumRaidMembers();
+	if channelToSent == "RAID" then
+		playerItems = {};
+		for i = 1, 40 do
+			local name = UnitName("raid" .. i);
+			if name then
+				playerItems[name] = 0;
+			end;
+		end;
+	elseif channelToSent == "PARTY" then
+		playerItems = {};
+		for i = 1, currnumPartyMembers do
+			local name = UnitName("party" .. i);
+			if name then
+				playerItems[name] = 0;
+			end;
+		end;
+		playerName = UnitName("player");
+		if playerName then
+			playerItems[playerName] = 0;
+		end;
+	else
+		playerItems = {};
+		playerName = UnitName("player");
+		if playerName then
+			playerItems[playerName] = 0;
 		end;
 	end;
-	local playerName = UnitName("player");
-	tempPlayerItems[playerName] = playerItems[playerName];
-	playerItems = tempPlayerItems;
 end;
-local function RemoveMemberFromRaid()
-	local tempPlayerItems = {};
-	for i = 1, numRaidMembers do
-		local name = UnitName("raid" .. i);
-		if name and playerItems[name] then
-			tempPlayerItems[name] = playerItems[name];
+local function HandleRollBegin(rollID)
+	local itemLink = GetLootRollItemLink(rollID);
+	if not itemLink then
+		return;
+	end;
+	local texture, name, count = GetLootRollItemInfo(rollID);
+	if name == targetItemName then
+		Print(name .. "-rollID->" .. rollID);
+		numTargetItemInRoll = numTargetItemInRoll + 1;
+		if numTargetItemInRoll == 1 then
+			SendMsg("Before this roll:");
+			SendGroupCount("members");
 		end;
 	end;
-	playerItems = tempPlayerItems;
 end;
-local function OnGroupChanged()
+local function UpdateGroupStatus(rollID)
 	if not RR_ITEM then
 		RR_ITEM = "Righteous Orb";
 	end;
 	if targetItemName == "" then
 		targetItemName = RR_ITEM;
 	end;
+	local currentMembers = {};
+	local index = 1;
 	local currnumPartyMembers = GetNumPartyMembers();
 	local currnumRaidMembers = GetNumRaidMembers();
 	if currnumRaidMembers ~= 0 then
 		channelToSent = "RAID";
-		if currnumRaidMembers > numRaidMembers then
-			numRaidMembers = currnumRaidMembers;
-			ResetRaid(currnumRaidMembers);
-		elseif currnumRaidMembers < numRaidMembers then
-			numRaidMembers = currnumRaidMembers;
-			RemoveMemberFromRaid();
+		for i = 1, 40 do
+			local name = UnitName("raid" .. i);
+			if name then
+				currentMembers[index] = name;
+				index = index + 1;
+			end;
 		end;
 	elseif currnumPartyMembers ~= 0 then
 		channelToSent = "PARTY";
-		if currnumPartyMembers > numPartyMembers then
-			numPartyMembers = currnumPartyMembers;
-			ResetParty(currnumPartyMembers);
-		elseif currnumPartyMembers < numPartyMembers then
-			numPartyMembers = currnumPartyMembers;
-			RemoveMemberFromParty();
+		for i = 1, currnumPartyMembers do
+			local name = UnitName("party" .. i);
+			if name then
+				currentMembers[index] = name;
+				index = index + 1;
+			end;
+		end;
+		playerName = UnitName("player");
+		if playerName then
+			currentMembers[index] = playerName;
+			index = index + 1;
 		end;
 	else
 		channelToSent = "SAY";
-		flagSay = false;
+		playerName = UnitName("player");
+		if playerName then
+			currentMembers[index] = playerName;
+			index = index + 1;
+		end;
+	end;
+	local storedMembers = {};
+	local index2 = 1;
+	for name, _ in pairs(playerItems) do
+		storedMembers[index2] = name;
+		index2 = index2 + 1;
+	end;
+	table.sort(currentMembers);
+	table.sort(storedMembers);
+	if table.getn(currentMembers) > table.getn(storedMembers) then
+		Print("Group changed: Members increased from " .. table.getn(storedMembers) .. " to " .. table.getn(currentMembers));
+		ResetGroup();
+	elseif table.getn(currentMembers) < table.getn(storedMembers) then
+		local leftMembers = {};
+		for i, name in ipairs(storedMembers) do
+			local found = false;
+			for j, currentName in ipairs(currentMembers) do
+				if name == currentName then
+					found = true;
+					break;
+				end;
+			end;
+			if not found then
+				table.insert(leftMembers, name);
+			end;
+		end;
+		local leftMembersStr = table.concat(leftMembers, ", ");
+		Print("Group changed: " .. leftMembersStr .. " left. Members decreased from " .. table.getn(storedMembers) .. " to " .. table.getn(currentMembers));
+		for i, name in ipairs(leftMembers) do
+			playerItems[name] = nil;
+		end;
+	end;
+	if rollID then
+		HandleRollBegin(rollID);
 	end;
 end;
-local function HandleLootRoll(rollID)
-	local itemLink = GetLootRollItemLink(rollID);
-	if not itemLink then
-		return;
-	end;
-	local texture, name, count = GetLootRollItemInfo(rollID);
-	if name == targetItemName and (not ismute) then
-		OnGroupChanged();
-		flagSay = true;
-		SendChatMessage("Before this roll:", channelToSent);
-		sendCurrItemCount("group");
-	end;
-end;
-local function HandleChatMsgLoot(msg)
-	local playerName = "";
+local function ProcessWinner(msg, wName)
+	local winnerName = wName;
 	local itemName = "";
 	local itemNameBracket = "";
 	local startPos, endPos = strfind(msg, " won: ");
-	if startPos and endPos then
-		playerName = strsub(msg, 1, startPos - 1);
-		itemNameBracket = strsub(msg, endPos + 1);
-		local startPos2 = strfind(itemNameBracket, "%[");
-		local endPos2 = strfind(itemNameBracket, "%]");
-		itemName = strsub(itemNameBracket, startPos2 + 1, endPos2 - 1);
-	else
+	itemNameBracket = strsub(msg, endPos + 1);
+	local startPos2 = strfind(itemNameBracket, "%[");
+	local endPos2 = strfind(itemNameBracket, "%]");
+	itemName = strsub(itemNameBracket, startPos2 + 1, endPos2 - 1);
+	if winnerName and itemName and itemName == targetItemName then
+		playerItems[winnerName] = playerItems[winnerName] + 1;
+		SendMsg(string.format("%s won %s!", winnerName, itemName));
+		numTargetItemInRoll = numTargetItemInRoll - 1;
+		if numTargetItemInRoll == 0 then
+			SendGroupCount("members");
+		end;
+	end;
+end;
+local function HandleRollResult(msg)
+	if channelToSent == "SAY" and (not strfind(msg, targetItemName)) or strfind(msg, "Roll -") then
 		return;
 	end;
-	if playerName == "You" then
-		playerName = UnitName("player");
+	if not RR_ITEM then
+		RR_ITEM = "Righteous Orb";
 	end;
-	if playerName and itemName and itemName == targetItemName then
-		playerItems[playerName].count = playerItems[playerName].count + 1;
-		SendChatMessage(string.format("%s won %s!", playerName, itemName), channelToSent);
-		sendCurrItemCount("group");
+	if targetItemName == "" then
+		targetItemName = RR_ITEM;
+	end;
+	playerName = UnitName("player");
+	if not tbGroupRollChoices then
+		tbGroupRollChoices = {};
+	end;
+	for name, count in pairs(playerItems) do
+		local tempName = name;
+		if tempName == playerName then
+			tempName = "You";
+		end;
+		local startPos2, endPos2 = strfind(msg, tempName);
+		if endPos2 then
+			if strfind(msg, "Need for") then
+				tbGroupRollChoices[name] = "need";
+			elseif strfind(msg, "Greed for") then
+				tbGroupRollChoices[name] = "greed";
+			elseif strfind(msg, "passed on") then
+				tbGroupRollChoices[name] = "pass";
+			elseif strfind(msg, "won: ") then
+				ProcessWinner(msg, name);
+			end;
+		end;
 	end;
 end;
 local function UpdateItemCountsFromInput(input)
-	local counts = {};
-	for count in gfind(input, "%d+") do
-		table.insert(counts, tonumber(count));
-	end;
+	local numGroupMembers = 0;
 	if channelToSent == "PARTY" then
-		if table.getn(counts) ~= numPartyMembers + 1 then
-			print("Error: The input does not match the number of players.");
-			return false;
-		end;
-		local index = 1;
-		for i = 1, numPartyMembers do
-			local name = UnitName("party" .. i);
-			if name then
-				playerItems[name].count = counts[index];
-				index = index + 1;
-			end;
-		end;
-		playerItems[UnitName("player")].count = counts[index];
-		return true;
+		numGroupMembers = GetNumPartyMembers() + 1;
 	elseif channelToSent == "RAID" then
-		if table.getn(counts) ~= numRaidMembers then
-			print("Error: The input does not match the number of players.");
-			return false;
-		end;
-		local index = 1;
-		for i = 1, numRaidMembers do
-			local name = UnitName("raid" .. i);
-			if name then
-				playerItems[name].count = counts[index];
-				index = index + 1;
-			end;
-		end;
-		return true;
+		numGroupMembers = GetNumRaidMembers();
+	else
+		print("Error: You are not in a group.");
+		return;
 	end;
+	local valueTable = {};
+	for value in gfind(input, "%d+") do
+		table.insert(valueTable, tonumber(value));
+	end;
+	if table.getn(valueTable) ~= numGroupMembers then
+		print("Error: The input does not match the number of players.");
+		return;
+	end;
+	local i = 1;
+	for key, _ in pairs(playerItems) do
+		playerItems[key] = valueTable[i];
+		i = i + 1;
+	end;
+	playerName = UnitName("player");
+	local tempMsg = "[" .. targetItemName .. "]" .. " updated by " .. playerName .. ":";
+	SendMsg(tempMsg);
+	SendGroupCount("members");
 end;
 local function OnEventFunc()
 	if event == "START_LOOT_ROLL" then
-		HandleLootRoll(arg1);
+		UpdateGroupStatus(arg1);
 	elseif event == "CHAT_MSG_LOOT" then
-		HandleChatMsgLoot(arg1);
-	elseif event == "PARTY_MEMBERS_CHANGED" or event == "RAID_ROSTER_UPDATE" then
-		OnGroupChanged();
+		HandleRollResult(arg1);
 	end;
 end;
 local function rrtest()
-	Print("Round Robin is working great.");
+	Print("rrtest()");
 end;
 RRFrame:SetScript("OnEvent", OnEventFunc);
 SLASH_ROUNDROBINHOOD1 = "/rr";
 SlashCmdList.ROUNDROBINHOOD = function(msg)
+	UpdateGroupStatus(false);
 	local commandlist = {};
 	for command in gfind(msg, "[^ ]+") do
 		table.insert(commandlist, string.lower(command));
 	end;
 	local action = commandlist[1];
 	if action == "show" then
-		sendCurrItemCount("player");
+		SendGroupCount("player");
 	elseif action == "send" then
-		sendCurrItemCount("group");
+		local msg = "[" .. targetItemName .. "] currently are:";
+		SendMsg(msg);
+		SendGroupCount("members");
 	elseif action == "reset" then
-		local playerName = UnitName("player");
-		local tempMsg = "[" .. targetItemName .. "]" .. " counts have been reset by " .. playerName;
-		SendChatMessage(tempMsg, channelToSent);
-		numRaidMembers = 0;
-		numPartyMembers = 0;
-		OnGroupChanged();
+		ResetGroup();
 	elseif action == "set" then
-		if UpdateItemCountsFromInput(commandlist[2]) then
-			local playerName = UnitName("player");
-			local tempMsg = "[" .. targetItemName .. "]" .. " counts have been updated by " .. playerName;
-			SendChatMessage(tempMsg, channelToSent);
-			sendCurrItemCount("group");
+		local action2 = commandlist[2];
+		if not action2 then
+			local msg1 = "Incorrect input. please try like this: '/rr set 3,2,2,2,2'. Entries should match party members.";
+			local msg2 = "[" .. targetItemName .. "] currently are:";
+			SendMsg(msg1);
+			SendMsg(msg2);
+			SendGroupCount("player");
 		else
-			print("Invalid input. Use: '/rr set 3,2,2,2,2'. Entries should match party members.");
+			UpdateItemCountsFromInput(action2);
 		end;
 	elseif action == "item" then
 		if not RR_ITEM then
@@ -260,10 +296,10 @@ SlashCmdList.ROUNDROBINHOOD = function(msg)
 		end;
 	elseif action == "mute" then
 		isMute = true;
-		print("RoundRobin program started.");
+		print("RoundRobinood now MUTED.");
 	elseif action == "unmute" then
 		isMute = false;
-		print("RoundRobin program paused.");
+		print("RoundRobinood now Unmuted.");
 	elseif action == "test" then
 		rrtest();
 	else
