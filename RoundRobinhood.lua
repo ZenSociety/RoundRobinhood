@@ -2,7 +2,6 @@ RRFrame = CreateFrame("Frame", "RoundRobinFrame", WorldFrame);
 RRFrame:RegisterEvent("START_LOOT_ROLL");
 RRFrame:RegisterEvent("CHAT_MSG_LOOT");
 local targetItemName = "";
-local numTargetItemInRoll = 0;
 local playerItems = {};
 local playerName = "";
 local tbGroupRollChoices = {};
@@ -80,11 +79,8 @@ local function HandleRollBegin(rollID)
 	local texture, name, count = GetLootRollItemInfo(rollID);
 	if name == targetItemName then
 		Print(name .. "-rollID->" .. rollID);
-		numTargetItemInRoll = numTargetItemInRoll + 1;
-		if numTargetItemInRoll == 1 then
-			SendMsg("Before this roll:");
-			SendGroupCount("members");
-		end;
+		SendMsg("Before this roll:");
+		SendGroupCount("members");
 	end;
 end;
 local function UpdateGroupStatus(rollID)
@@ -176,10 +172,7 @@ local function ProcessWinner(msg, wName)
 	if winnerName and itemName and itemName == targetItemName then
 		playerItems[winnerName] = playerItems[winnerName] + 1;
 		SendMsg(string.format("%s won %s!", winnerName, itemName));
-		numTargetItemInRoll = numTargetItemInRoll - 1;
-		if numTargetItemInRoll == 0 then
-			SendGroupCount("members");
-		end;
+		SendGroupCount("members");
 	end;
 end;
 local function HandleRollResult(msg)
