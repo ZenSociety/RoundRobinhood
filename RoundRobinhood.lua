@@ -14,6 +14,11 @@ local function Print(msg)
 	end;
 	DEFAULT_CHAT_FRAME:AddMessage(msg);
 end;
+local function PrintColor(msg)
+	local r, g, b = 0.96, 0.55, 0.73;
+	local hexColor = string.format("|cFF%02X%02X%02X", r * 255, g * 255, b * 255);
+	print(hexColor .. msg);
+end;
 local function SendMsg(msg)
 	if isMute then
 		return;
@@ -243,8 +248,9 @@ local function OnEventFunc()
 		HandleRollResult(arg1);
 	end;
 end;
-local function rrtest()
-	Print("rrtest()");
+local function rrabout()
+	Print("You are running:");
+	PrintColor("RoundRobinhood Version 0.03");
 end;
 RRFrame:SetScript("OnEvent", OnEventFunc);
 SLASH_ROUNDROBINHOOD1 = "/rr";
@@ -278,24 +284,27 @@ SlashCmdList.ROUNDROBINHOOD = function(msg)
 		if not RR_ITEM then
 			RR_ITEM = "Righteous Orb";
 		end;
-		local extractedWord = string.match(msg, "%[(.-)%]");
-		if extractedWord then
-			targetItemName = extractedWord;
+		local startIndex, endIndex = string.find(msg, "%[(.-)%]");
+		local extractedWord = "";
+		if startIndex then
+			extractedWord = string.sub(msg, startIndex + 1, endIndex - 1);
 			RR_ITEM = extractedWord;
-			print("Item is updated: " .. RR_ITEM);
+			targetItemName = extractedWord;
+			PrintColor("Item is updated: [" .. targetItemName .. "]");
 		else
-			print("Item currently is: " .. RR_ITEM);
-			print("To change it, the input must contain square brackets i.e. /rr item [Righteous Orb].");
+			PrintColor("Item currently is: [" .. targetItemName .. "]");
+			print("To change it, the input must contain square brackets, Like: /rr item [Righteous Orb].");
 		end;
 	elseif action == "mute" then
 		isMute = true;
-		print("RoundRobinood now MUTED.");
+		PrintColor("RoundRobinood now MUTED.");
 	elseif action == "unmute" then
 		isMute = false;
-		print("RoundRobinood now Unmuted.");
-	elseif action == "test" then
-		rrtest();
+		PrintColor("RoundRobinood now Unmuted.");
+	elseif action == "about" then
+		rrabout();
 	else
-		print("Unknown command. Try: /rr show, send, reset, set, mute, unmute.");
+		PrintColor("Unknown command.");
+		print("Try: /rr show, send, item, reset, set, mute, unmute, about.");
 	end;
 end;
