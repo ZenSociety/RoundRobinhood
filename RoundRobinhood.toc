@@ -1,8 +1,8 @@
 ## Interface: 11200
 ## Title: |cff0070ddR|cffffffffound |cff0070ddR|cffffffffobinhood
-## Notes: A simple wow vanilla addon to track round robin loot distribution. /rr
+## Notes: A simple wow vanilla addon to track round robin loot distribution. /rrh
 ## Author: Croc
-## Version: 0.03
+## Version: 0.04
 ## SavedVariablesPerCharacter: RR_ITEM
 
 RoundRobinhood.lua

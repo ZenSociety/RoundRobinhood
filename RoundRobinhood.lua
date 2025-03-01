@@ -250,10 +250,10 @@ local function OnEventFunc()
 end;
 local function rrabout()
 	Print("You are running:");
-	PrintColor("RoundRobinhood Version 0.03");
+	PrintColor("RoundRobinhood Version 0.04");
 end;
 RRFrame:SetScript("OnEvent", OnEventFunc);
-SLASH_ROUNDROBINHOOD1 = "/rr";
+SLASH_ROUNDROBINHOOD1 = "/rrh";
 SlashCmdList.ROUNDROBINHOOD = function(msg)
 	UpdateGroupStatus(false);
 	local commandlist = {};
@@ -272,7 +272,7 @@ SlashCmdList.ROUNDROBINHOOD = function(msg)
 	elseif action == "set" then
 		local action2 = commandlist[2];
 		if not action2 then
-			local msg1 = "Incorrect input. please try like this: '/rr set 3,2,2,2,2'. Entries should match party members.";
+			local msg1 = "Incorrect input. please try like this: '/rrh set 3,2,2,2,2'. Entries should match party members.";
 			local msg2 = "[" .. targetItemName .. "] currently are:";
 			SendMsg(msg1);
 			SendMsg(msg2);
@@ -293,7 +293,7 @@ SlashCmdList.ROUNDROBINHOOD = function(msg)
 			PrintColor("Item is updated: [" .. targetItemName .. "]");
 		else
 			PrintColor("Item currently is: [" .. targetItemName .. "]");
-			print("To change it, the input must contain square brackets, Like: /rr item [Righteous Orb].");
+			print("To change it, the input must contain square brackets, Like: /rrh item [Righteous Orb].");
 		end;
 	elseif action == "mute" then
 		isMute = true;
@@ -305,6 +305,6 @@ SlashCmdList.ROUNDROBINHOOD = function(msg)
 		rrabout();
 	else
 		PrintColor("Unknown command.");
-		print("Try: /rr show, send, item, reset, set, mute, unmute, about.");
+		print("Try: /rrh show, send, item, reset, set, mute, unmute, about.");
 	end;
 end;

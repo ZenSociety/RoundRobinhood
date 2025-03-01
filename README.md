@@ -21,14 +21,14 @@
 ## Commands
 Use the following commands in the chat to interact with the addon:
 
-- `/rr show`: Displays the current item counts for the player.
-- `/rr send`: Sends the current item counts to the group chat.
-- `/rr reset`: Resets the item counts for all players.
-- `/rr set <counts>`: Updates item counts based on the provided input (e.g., `/rr set 3,2,2,2,2`).
-- `/rr item [Item Name]`: Sets the target item for tracking (e.g., `/rr item [Righteous Orb]`).
-- `/rr mute`: Mutes the addon, pausing item tracking.
-- `/rr unmute`: Unmutes the addon, resuming item tracking.
-- `/rr test`: Tests the addon functionality with a simple message.
+- `/rrh show`: Displays the current item counts for the player.
+- `/rrh send`: Sends the current item counts to the group chat.
+- `/rrh reset`: Resets the item counts for all players.
+- `/rrh set <counts>`: Updates item counts based on the provided input (e.g., `/rrh set 3,2,2,2,2`).
+- `/rrh item [Item Name]`: Sets the target item for tracking (e.g., `/rrh item [Righteous Orb]`).
+- `/rrh mute`: Mutes the addon, pausing item tracking.
+- `/rrh unmute`: Unmutes the addon, resuming item tracking.
+- `/rrh test`: Tests the addon functionality with a simple message.
 
 ## Saved Variables
 The addon saves item counts per character, allowing you to maintain your progress across sessions.
