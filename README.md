@@ -5,7 +5,6 @@
 
 ## Features
 - Tracks item counts for a specified target item.
-- Automatically resets counts when party or raid members change.
 - Sends messages to the group or raid chat to inform players of item counts and distribution.
 - Supports commands for managing item counts and settings.
 
@@ -18,26 +17,24 @@
 4. Copy "RoundRobinhood" into Wow-Directory\Interface\AddOns
 5. Restart WoW game client.
 
-## Commands
-Use the following commands in the chat to interact with the addon:
+### Commands
 
-- `/rrh show`: Displays the current item counts for the player.
-- `/rrh send`: Sends the current item counts to the group chat.
-- `/rrh reset`: Resets the item counts for all players.
-- `/rrh set <counts>`: Updates item counts based on the provided input (e.g., `/rrh set 3,2,2,2,2`).
-- `/rrh item [Item Name]`: Sets the target item for tracking (e.g., `/rrh item [Righteous Orb]`).
-- `/rrh mute`: Mutes the addon, pausing item tracking.
-- `/rrh unmute`: Unmutes the addon, resuming item tracking.
-- `/rrh test`: Tests the addon functionality with a simple message.
+- `/rrh show [item_index]`: Displays the current item counts for the specified item.
+- `/rrh send [item_index]`: Sends the current item counts for the specified item to the chat.
+- `/rrh reset [item_index]`: Resets the item counts for the specified item or all items.
+- `/rrh set [player_index] [item_index] [count]`: Sets the item count for the specified player and item.
+- `/rrh item add [item_name]`: Adds a new item to the tracking list.
+- `/rrh item remove [item_name]`: Removes an item from the tracking list.
+- `/rrh mute`: Mutes the addon's chat output.
+- `/rrh unmute`: Unmutes the addon's chat output.
+- `/rrh about`: Displays information about the addon.
 
-## Saved Variables
-The addon saves item counts per character, allowing you to maintain your progress across sessions.
 
 ## Author
 **Croc**
 
 ## Version
-**0.01**
+**1.0**
 
 ## Date
 **Created in 2024**
@@ -47,6 +44,3 @@ This addon is released under the MIT License.
 
 ## Support
 For issues or feature requests, please open an issue on the [GitHub repository](https://github.com/ZenSociety/RoundRobinhood/issues) or contact the author directly.
-
-## Acknowledgments
-Thanks to the Turtle WoW Team.
