@@ -34,7 +34,7 @@
 **Croc**
 
 ## Version
-**1.0**
+**1.1**
 
 ## Date
 **Created in 2024**

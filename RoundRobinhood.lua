@@ -3,6 +3,7 @@ RRFrame:RegisterEvent("START_LOOT_ROLL");
 RRFrame:RegisterEvent("CHAT_MSG_LOOT");
 RRFrame:RegisterEvent("PLAYER_ENTERING_WORLD");
 local isMute = false;
+local isNotified = false;
 local channelToSent = "SAY";
 local gfind = string.gmatch or string.gfind;
 local DEFAULT_RR_ITEMS = {
@@ -48,11 +49,15 @@ local function SendMsg(msg)
 	end;
 end;
 local function CheckVariableExpiration()
+	if not RR_TIMESTAMP then
+		RR_TIMESTAMP = 1640966400;
+	end;
 	local specificTimestamp = RR_TIMESTAMP;
 	local currentTimestamp = time();
 	local difference = currentTimestamp - specificTimestamp;
-	if difference >= 86400 then
-		RR_TIMESTAMP = currentTimestamp;
+	local secondsInThreeHours = 10800;
+	if difference >= secondsInThreeHours then
+		isNotified = false;
 		for itemName in pairs(RR_ITEMS) do
 			RR_ITEMS[itemName] = {};
 		end;
@@ -140,6 +145,16 @@ local function StartRollHandler(rollID)
 	local texture, name, count = GetLootRollItemInfo(rollID);
 	for itemName, players in pairs(RR_ITEMS) do
 		if itemName == name then
+			if not RR_TIMESTAMP then
+				RR_TIMESTAMP = 1640966400;
+			else
+				RR_TIMESTAMP = time();
+			end;
+			if not isMute and (not isNotified) then
+				local msg1 = "To mute RoundRobinhood messages, try '/rrh mute'";
+				PrintColor(msg1);
+				isNotified = true;
+			end;
 			OutputCountsByItem(itemName, "roll");
 			break;
 		end;
@@ -177,16 +192,12 @@ local function OnEventFunc()
 	elseif event == "CHAT_MSG_LOOT" then
 		LootResultHandler(arg1);
 	elseif event == "PLAYER_ENTERING_WORLD" then
-		if not RR_TIMESTAMP then
-			RR_TIMESTAMP = 1640966400;
-		else
-			CheckVariableExpiration();
-		end;
+		CheckVariableExpiration();
 	end;
 end;
 local function AboutRR()
 	Print("You are running:");
-	PrintColor("RoundRobinhood Version 1.0");
+	PrintColor("RoundRobinhood Version 1.1");
 end;
 RRFrame:SetScript("OnEvent", OnEventFunc);
 SLASH_ROUNDROBINHOOD1 = "/rrh";
