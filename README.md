@@ -1,46 +1,65 @@
 # RoundRobinhood
 
-## Description
-**RoundRobinhood** is a simple WoW v1.12 addon designed to track round-robin loot distribution among party and raid members. It helps players keep track of item counts and ensures fair distribution during loot rolls.
+An addon for World of Warcraft (Vanilla 1.12) to assist with Round Robin loot distribution and auto-rolling.
+
+![RoundRobinhood](https://raw.githubusercontent.com/ZenSociety/ProjectImagesVault/refs/heads/main/v1.png)
 
 ## Features
-- Tracks item counts for a specified target item.
-- Sends messages to the group or raid chat to inform players of item counts and distribution.
-- Supports commands for managing item counts and settings.
 
-![preview](https://raw.githubusercontent.com/ZenSociety/ProjectImagesVault/refs/heads/main/rr1.png)
+*   **Round Robin Tracking:** Easily track who has received which items.
+    *   Add/Remove items to track.
+    *   Manually adjust player counts.
+    *   Send current standings to party/raid chat.
+    *   Reset all counts for a fresh start.
+*   **Advanced Auto-Rolling:** Configure automatic rolling for specific items or item qualities.
+    *   Set items to Need, Greed, Pass, or Manual.
+    *   Special "Round Robin" setting automatically Needs if you have the lowest count and Passes otherwise.
+    *   Enable/disable the entire auto-roll system with one click.
+    *   Mute auto-roll messages to keep your chat clean.
 
-## Installation (Vanilla, 1.12)
-1. Download **[Latest Version](https://github.com/ZenSociety/RoundRobinhood/archive/master.zip)**
-2. Unpack the Zip file
-3. Rename the folder "RoundRobinhood-main" to "RoundRobinhood"
-4. Copy "RoundRobinhood" into Wow-Directory\Interface\AddOns
-5. Restart WoW game client.
+## Installation
 
-### Commands
+1.  Download the latest release of RoundRobinhood.
+2.  Extract the contents into your `World of Warcraft/Interface/AddOns/` directory.
+3.  Ensure the folder structure is `Interface/AddOns/RoundRobinhood/` with all the `.toc`, `.xml`, and `.lua` files directly inside.
 
-- `/rrh show [item_index]`: Displays the current item counts for the specified item.
-- `/rrh send [item_index]`: Sends the current item counts for the specified item to the chat.
-- `/rrh reset [item_index]`: Resets the item counts for the specified item or all items.
-- `/rrh set [player_index] [item_index] [count]`: Sets the item count for the specified player and item.
-- `/rrh item add [item_name]`: Adds a new item to the tracking list.
-- `/rrh item remove [item_name]`: Removes an item from the tracking list.
-- `/rrh mute`: Mutes the addon's chat output.
-- `/rrh unmute`: Unmutes the addon's chat output.
-- `/rrh about`: Displays information about the addon.
+## Usage
+typing `/rrh` to open the main interface.
 
+The interface is divided into four tabs:
 
-## Author
-**Croc**
+### 1. Records Tab
 
-## Version
-**1.1**
+This is where you manage the items you want to track for Round Robin distribution.
 
-## Date
-**Created in 2024**
+*   **Item Dropdown:** Select the item you want to view or manage.
+*   **Add/Delete:** Add a new item to the list or delete the currently selected one.
+*   **Player List:** Shows all players in your group/raid and their current count for the selected item. You can manually adjust counts with the `+` and `-` buttons.
+*   **Mute/Unmute:** Toggles addon messages in your chat.
+*   **Send:** Sends the current list for the selected item to your party/raid chat.
+*   **Reset:** Resets the counts for **all** tracked items to zero.
+
+### 2. AUTO Tab
+
+Configure your automatic rolling preferences here.
+
+*   **Start/Stop:** Globally enables or disables the auto-rolling feature.
+*   **Mute/Unmute:** Toggles the auto-roll notification messages in chat.
+*   **Add:** Add a new item or item quality to the auto-roll list.
+*   **Item List:** Click on any item to edit its auto-roll setting (Need, Greed, Pass, Round Robin, or Manual).
+
+### 3. General Tab
+
+This tab is reserved for future features.
+
+### 4. About Tab
+
+Contains information about the addon, the author, and a list of all available slash commands.
+
+## Contributing
+
+Feel free to contribute by submitting issues or pull requests on the GitHub repository.
 
 ## License
-This addon is released under the MIT License.
 
-## Support
-For issues or feature requests, please open an issue on the [GitHub repository](https://github.com/ZenSociety/RoundRobinhood/issues) or contact the author directly.
+[MIT License](LICENSE)

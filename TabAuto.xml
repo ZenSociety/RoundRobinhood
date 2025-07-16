@@ -1,0 +1,243 @@
+<!--
+    TabAuto.xml
+
+    This file defines the UI layout for the "Auto" tab in the RoundRobinhood addon.
+    It includes the template for list items, the main tab frame, control buttons,
+    a scrollable list area, and the pop-up detail/edit frame.
+-->
+<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.blizzard.com/wow/ui/" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+    <!-- Template for a single bar line in the layout editor -->
+    <Button name="RRH_Auto_Settings_BarLine" virtual="true">
+        <Size>
+            <AbsDimension x="275" y="16"/>
+        </Size>
+        <Layers>
+            <Layer level="OVERLAY">
+                <!-- Displays the item name -->
+                <FontString name="$parentName" inherits="GameFontHighlightSmall" justifyH="LEFT">
+                    <Size>
+                        <AbsDimension x="200" y="0"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT"/>
+                    </Anchors>
+                </FontString>
+                <!-- Displays the auto roll choice (e.g., "Need", "Greed") -->
+                <FontString name="$parentPosition" inherits="GameFontHighlightSmall" justifyH="LEFT">
+                    <Size>
+                        <AbsDimension x="75" y="0"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <HighlightTexture file="Interface\FriendsFrame\UI-FriendsFrame-HighlightBar" alphaMode="ADD"/>
+        <Scripts>
+            <OnClick>RRH_Auto_Settings_Layout_SelectBar(this:GetID());</OnClick>
+        </Scripts>
+    </Button>
+
+    <!-- Main Frame for the Auto Tab -->
+    <Frame name="RoundRobinhood_AutoTab_Template" virtual="true">
+        <Size x="320" y="430"/>
+        <Frames>
+            <!-- Top control buttons -->
+            <Button name="RoundRobinhood_TabAuto_ContentStartButton" inherits="OptionsButtonTemplate" text="Start">
+                <Size><AbsDimension x="55" y="22"/></Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="70" y="-30"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>RRH_Auto_StartButton_OnClick()</OnClick>
+                </Scripts>
+            </Button>
+            <Button name="RoundRobinhood_TabAuto_ContentMuteButton" inherits="OptionsButtonTemplate" text="Mute">
+                <Size><AbsDimension x="55" y="22"/></Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentStartButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="10" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>RRH_Auto_MuteButton_OnClick()</OnClick>
+                </Scripts>
+            </Button>
+            <Button name="$parentAddNewButton" inherits="OptionsButtonTemplate" text="Add">
+                <Size><AbsDimension x="55" y="22"/></Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentMuteButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="10" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>RRH_Auto_Settings_Layout_SelectBar(20)</OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Header for the scrollable list -->
+            <Button name="RRH_Auto_Settings_BarLine0" inherits="RRH_Auto_Settings_BarLine">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="20" y="-64"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            
+            <!-- ScrollFrame for the list of items -->
+            <ScrollFrame name="RRH_Auto_Settings_LayoutScrollBar" inherits="FauxScrollFrameTemplate">
+                <Size>
+                    <AbsDimension x="275" y="325"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="RRH_Auto_Settings_BarLine0" relativePoint="BOTTOMRIGHT"/>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="RRH_Auto_Settings_BarLine17" relativePoint="BOTTOMRIGHT"/>
+                </Anchors>
+                <Scripts>
+                    <OnVerticalScroll>RRH_Auto_Settings_Layout_OnScroll(self, arg1);</OnVerticalScroll>
+                    <OnShow>RRH_Auto_Settings_Layout_OnShow(self);</OnShow>
+                </Scripts>
+            </ScrollFrame>
+        </Frames>
+        <Scripts>
+            <OnLoad>RRH_Auto_Tab_OnLoad(this);</OnLoad>
+        </Scripts>
+    </Frame>
+
+    <!-- Pop-up frame for adding or editing an item -->
+    <Frame name="RRH_Auto_BarDetailFrame" hidden="true" toplevel="true" parent="RoundRobinhood_TabAuto_Content" frameStrata="HIGH" enableMouse="true">
+        <Size>
+            <AbsDimension x="250" y="200"/>
+        </Size>
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+            <BackgroundInsets>
+                <AbsInset left="11" right="12" top="12" bottom="11"/>
+            </BackgroundInsets>
+            <TileSize>
+                <AbsValue val="32"/>
+            </TileSize>
+            <EdgeSize>
+                <AbsValue val="32"/>
+            </EdgeSize>
+        </Backdrop>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="RRH_Auto_BarDetail_Header" inherits="GameFontNormalLarge" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="20" y="-15"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="RRH_Auto_BarDetail_ItemName" inherits="GameFontNormal" justifyH="LEFT" text="Item Name">
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-50"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <!-- EditBox for entering a new item name -->
+            <EditBox name="RRH_Auto_BarDetail_LabelEditBox" autoFocus="false" inherits="InputBoxTemplate">
+                <Size>
+                    <AbsDimension x="150" y="20"/>
+                </Size>
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-50"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                <FontString inherits="ChatFontNormal"/>
+            </EditBox>
+            <!-- Dropdown for selecting the roll choice -->
+            <Button name="RRH_Auto_BarDetail_OutputTarget" inherits="UIDropDownMenuTemplate">
+                <Size>
+                    <AbsDimension x="60" y="32"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOP" relativeTo="RRH_Auto_BarDetail_ItemName" relativePoint="BOTTOM">
+                        <Offset>
+                            <AbsDimension x="0" y="-25"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>RRH_Auto_BarDetail_OutputTarget_OnLoad(this);</OnLoad>
+                </Scripts>
+            </Button>
+            <!-- Save button -->
+            <Button name="RRH_Auto_BarDetail_Accept" inherits="OptionsButtonTemplate" text="Save">
+                <Size>
+                    <AbsDimension x="75" y="22"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT">
+                        <Offset>
+                            <AbsDimension x="-12" y="15"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        RRH_Auto_BarDetail_Accept();
+                        this:GetParent():Hide();
+                    </OnClick>
+                </Scripts>
+            </Button>
+            <!-- Remove button -->
+            <Button name="RRH_Auto_BarDetail_Remove" inherits="OptionsButtonTemplate" text="Remove">
+                <Size>
+                    <AbsDimension x="75" y="22"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="12" y="15"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        RRH_Auto_BarDetail_RemoveBar();
+                        this:GetParent():Hide();
+                    </OnClick>
+                </Scripts>
+            </Button>
+            <!-- Close button -->
+             <Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-3" y="-3"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                 <Scripts>
+                    <OnClick>this:GetParent():Hide();</OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+    </Frame>
+</Ui>

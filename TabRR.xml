@@ -1,0 +1,354 @@
+<!--
+    TabRR.xml
+
+    This file defines the UI layout for the "RR" (Round Robin) tab.
+    It includes top control buttons, an item selection dropdown, and a scrollable list
+    to display players and their item counts for the selected item.
+-->
+<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.blizzard.com/wow/ui/" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+    <!-- Template for a single player line in the list -->
+    <Button name="RRH_RR_PlayerLine" virtual="true">
+        <Size>
+            <AbsDimension x="275" y="32"/>
+        </Size>
+        <Layers>
+            <Layer level="OVERLAY">
+                <!-- Displays the player's name -->
+                <FontString name="$parentName" inherits="GameFontHighlight" justifyH="LEFT">
+                    <Size>
+                        <AbsDimension x="180" y="0"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT"/>
+                    </Anchors>
+                </FontString>
+                <!-- Displays the player's item count -->
+                <FontString name="$parentCount" inherits="GameFontHighlight" justifyH="CENTER">
+                    <Size>
+                        <AbsDimension x="30" y="0"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentDecrement" relativePoint="RIGHT"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <!-- Decrement Button (-) -->
+            <Button name="$parentDecrement">
+                <Size>
+                    <AbsDimension x="12" y="12"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeTo="$parentCount" relativePoint="LEFT"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick>RRH_RR_DecrementPlayerCount(this:GetParent():GetID());</OnClick>
+                </Scripts>
+                <NormalTexture file="Interface\MONEYFRAME\Arrow-Left-Up"/>
+                <PushedTexture file="Interface\MONEYFRAME\Arrow-Left-Down"/>
+                <HighlightTexture file="Interface\Buttons\ButtonHilight-SquareQuickslot" alphaMode="ADD"/>
+            </Button>
+            <!-- Increment Button (+) -->
+            <Button name="$parentIncrement">
+                <Size>
+                    <AbsDimension x="12" y="12"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentCount" relativePoint="RIGHT"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick>RRH_RR_IncrementPlayerCount(this:GetParent():GetID());</OnClick>
+                </Scripts>
+                <NormalTexture file="Interface\MONEYFRAME\Arrow-Right-Up"/>
+                <PushedTexture file="Interface\MONEYFRAME\Arrow-Right-Down"/>
+                <HighlightTexture file="Interface\Buttons\ButtonHilight-SquareQuickslot" alphaMode="ADD"/>
+            </Button>
+        </Frames>
+        <HighlightTexture file="Interface\FriendsFrame\UI-FriendsFrame-HighlightBar" alphaMode="ADD"/>
+    </Button>
+
+    <!-- Main Frame for the RR Tab -->
+    <Frame name="RoundRobinhood_RRTab_Template" virtual="true">
+        <Size x="320" y="430"/>
+        <Frames>
+            <!-- Top control buttons -->            
+            <Button name="$parentMuteButton" inherits="OptionsButtonTemplate" text="Mute">
+                <Size><AbsDimension x="55" y="22"/></Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="80" y="-45"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>RRH_RR_MuteButton_OnClick()</OnClick>
+                </Scripts>
+            </Button>
+            <Button name="$parentSendButton" inherits="OptionsButtonTemplate" text="Send">
+                <Size><AbsDimension x="55" y="22"/></Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentMuteButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="10" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>RRH_RR_SendButton_OnClick()</OnClick>
+                </Scripts>
+            </Button>
+
+            <Button name="RoundRobinhood_TabRR_ContentResetButton" inherits="OptionsButtonTemplate" text="Reset">
+                <Size><AbsDimension x="55" y="22"/></Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="$parentSendButton" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="10" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>RRH_RR_ResetButton_OnClick()</OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- Item selection dropdown -->
+            <Button name="RRH_RR_ItemDropdown" inherits="UIDropDownMenuTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentMuteButton" relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="-3" y="-20"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>RRH_RR_ItemDropdown_OnLoad(this)</OnLoad>
+                </Scripts>
+            </Button>
+
+            <Button name="$parentAddButton" inherits="OptionsButtonTemplate" text="Add">
+                <Size><AbsDimension x="55" y="22"/></Size>
+                <Anchors>
+                    <Anchor point="LEFT" relativeTo="RRH_RR_ItemDropdown" relativePoint="RIGHT">
+                        <Offset>
+                            <AbsDimension x="-10" y="2"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>RRH_RR_AddButton_OnClick()</OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- dropdown Delete button -->
+            <Button name="RoundRobinhood_TabRR_ContentDeleteButton" inherits="OptionsButtonTemplate" text="Delete">
+                <Size><AbsDimension x="55" y="22"/></Size>
+                <Anchors>
+                    <Anchor point="RIGHT" relativeTo="RRH_RR_ItemDropdown" relativePoint="LEFT">
+                        <Offset>
+                            <AbsDimension x="12" y="2"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>RRH_RR_DeleteButton_OnClick()</OnClick>
+                </Scripts>
+            </Button>
+
+            <!-- ScrollFrame for the list of players -->
+            <ScrollFrame name="RRH_RR_PlayerListScrollFrame" inherits="FauxScrollFrameTemplate">
+                <Size>
+                    <!-- <AbsDimension x="275" y="280"/> -->
+                    <AbsDimension x="220" y="260"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="RRH_RR_ItemDropdown" relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="-25" y="-10"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnVerticalScroll>RRH_RR_PlayerList_OnScroll(self, arg1);</OnVerticalScroll>
+                    <OnShow>RRH_RR_PlayerList_OnShow(self);</OnShow>
+                </Scripts>
+            </ScrollFrame>
+        </Frames>
+        <Scripts>
+            <OnLoad>RRH_RR_Tab_OnLoad(this);</OnLoad>
+        </Scripts>
+    </Frame>
+
+    <!-- Pop-up frame for adding a new RR item -->
+    <Frame name="RRH_RR_AddItemFrame" hidden="true" toplevel="true" parent="RoundRobinhood_TabRR_Content" frameStrata="HIGH" enableMouse="true">
+        <Size>
+            <AbsDimension x="250" y="150"/>
+        </Size>
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+            <BackgroundInsets>
+                <AbsInset left="11" right="12" top="12" bottom="11"/>
+            </BackgroundInsets>
+            <TileSize>
+                <AbsValue val="32"/>
+            </TileSize>
+            <EdgeSize>
+                <AbsValue val="32"/>
+            </EdgeSize>
+        </Backdrop>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="$parentHeader" inherits="GameFontNormalLarge" text="Add New Item">
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-15"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <EditBox name="$parentInputBox" autoFocus="false" inherits="InputBoxTemplate">
+                <Size>
+                    <AbsDimension x="150" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="CENTER">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <FontString inherits="ChatFontNormal"/>
+            </EditBox>
+            <Button name="$parentSaveButton" inherits="OptionsButtonTemplate" text="Save">
+                <Size>
+                    <AbsDimension x="75" y="22"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT">
+                        <Offset>
+                            <AbsDimension x="-12" y="15"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        RRH_RR_AddItem_Save();
+                        this:GetParent():Hide();
+                    </OnClick>
+                </Scripts>
+            </Button>
+            <Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-3" y="-3"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>this:GetParent():Hide();</OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+    </Frame>
+
+    <!-- Pop-up frame for deleting an RR item -->
+    <Frame name="RRH_RR_DeleteItemFrame" hidden="true" toplevel="true" parent="RoundRobinhood_TabRR_Content" frameStrata="HIGH" enableMouse="true">
+        <Size>
+            <AbsDimension x="250" y="150"/>
+        </Size>
+        <Anchors>
+            <Anchor point="CENTER"/>
+        </Anchors>
+        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+            <BackgroundInsets>
+                <AbsInset left="11" right="12" top="12" bottom="11"/>
+            </BackgroundInsets>
+            <TileSize>
+                <AbsValue val="32"/>
+            </TileSize>
+            <EdgeSize>
+                <AbsValue val="32"/>
+            </EdgeSize>
+        </Backdrop>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="$parentHeader" inherits="GameFontNormalLarge" text="Confirm Delete">
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-15"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                 <FontString name="$parentSubText" inherits="GameFontNormal">
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Button name="$parentConfirmButton" inherits="OptionsButtonTemplate" text="Confirm">
+                <Size>
+                    <AbsDimension x="75" y="22"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="40" y="15"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        RRH_RR_DeleteItem_Confirm();
+                        this:GetParent():Hide();
+                    </OnClick>
+                </Scripts>
+            </Button>
+            <Button name="$parentCancelButton" inherits="OptionsButtonTemplate" text="Cancel">
+                <Size>
+                    <AbsDimension x="75" y="22"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT">
+                        <Offset>
+                            <AbsDimension x="-40" y="15"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        this:GetParent():Hide();
+                    </OnClick>
+                </Scripts>
+            </Button>
+            <Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-3" y="-3"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>this:GetParent():Hide();</OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+    </Frame>
+</Ui>

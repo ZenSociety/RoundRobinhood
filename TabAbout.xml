@@ -1,0 +1,43 @@
+<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.blizzard.com/wow/ui/" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+    <Frame name="RoundRobinhood_AboutTab_Template" virtual="true">
+        <Size x="340" y="400"/>
+        <Anchors><Anchor point="TOPLEFT" x="22" y="-77"/></Anchors>
+        <Frames>
+            <Button name="RoundRobinhood_TabAbout_ContentTab1" inherits="RoundRobinhood_SubTabButtonTemplate" id="1">
+                <Anchors>
+                    <Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+                        <Offset>
+                            <AbsDimension x="-60" y="-40"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+            </Button>
+            <Button name="RoundRobinhood_TabAbout_ContentTab2" inherits="RoundRobinhood_SubTabButtonTemplate" id="2"/>
+            <ScrollFrame name="RoundRobinhood_About_ScrollFrame" inherits="UIPanelScrollFrameTemplate">
+                <Size>
+                    <AbsDimension x="295" y="353"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+                        <Offset>
+                            <AbsDimension x="0" y="-76"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <ScrollChild>
+                    <SimpleHTML name="RoundRobinhood_About_Text">
+                        <Size>
+                            <AbsDimension x="295" y="50"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="TOPLEFT"/>
+                        </Anchors>
+                        <FontString inherits="GameFontNormal"/>
+                        <FontStringHeader1 inherits="GameFontHighlightLarge"/>
+                        <FontStringHeader2 inherits="GameFontHighlight"/>
+                    </SimpleHTML>
+                </ScrollChild>
+            </ScrollFrame>
+        </Frames>
+    </Frame>
+</Ui>
